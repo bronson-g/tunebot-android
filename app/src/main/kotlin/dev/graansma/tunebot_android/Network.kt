@@ -1,5 +1,6 @@
 package dev.graansma.tunebot_android
 
+import android.util.Log
 import com.stealthcopter.networktools.SubnetDevices
 import com.stealthcopter.networktools.subnet.Device
 import kotlin.collections.ArrayList
@@ -9,7 +10,11 @@ abstract class Network {
     private var isScanning: Boolean = false
     private var scanner: SubnetDevices? = null
     private val listener = object : SubnetDevices.OnSubnetDeviceFound {
-        override fun onDeviceFound(device: Device?) {}
+        override fun onDeviceFound(device: Device?) {
+            if(device != null) {
+                Log.i("Network", "mac: ${device.mac}, ip: ${device.ip}, hostname: ${device.hostname}")
+            }
+        }
 
         override fun onFinished(devicesFound: ArrayList<Device>?) {
             devices = (devicesFound?.map { it.mac } ?: setOf()) as Set<String>

@@ -11,7 +11,7 @@ import java.net.URL
 class Api(promotionLevel: PromotionLevel) {
     private val host: String = when(promotionLevel) {
         PromotionLevel.DEVELOPMENT -> "localhost"
-        PromotionLevel.PRODUCTION -> "graansma.dev"
+        PromotionLevel.PRODUCTION -> "tunebot-api.graansma.dev"
     }
 
     fun getPlaylist(mac: String): Playlist {

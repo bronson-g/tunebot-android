@@ -1,37 +1,97 @@
 package dev.graansma.tunebot_android
 
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.view.KeyEvent
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
-    private val controller = Controller(PromotionLevel.DEVELOPMENT) // TODO change this based on gradle/string xml values
+    private lateinit var controller: Controller
     private val network = object: Network() {
         override fun onScanComplete(macs: Set<String>) {
             controller.updateMasterList(macs)
-            // todo rebuild the queue
         }
     }
     private var scheduler: ScheduledExecutorService? = null
+    private val mediaPlayer = MediaPlayer()
+
+    private lateinit var nextButton: Button
+    private lateinit var previousButton: Button
+    private lateinit var playPauseButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-    }
 
-    // TODO a mediaplayer with a song queue. next, back, pause, play
+        controller = Controller(PromotionLevel.valueOf(getString(R.string.promotion_level)))
+
+        nextButton = findViewById(R.id.nextButton)
+        nextButton.setOnClickListener { next() }
+        previousButton = findViewById(R.id.previousButton)
+        previousButton.setOnClickListener { previous() }
+        playPauseButton = findViewById(R.id.playPauseButton)
+        playPauseButton.setOnClickListener { playPause() }
+
+        mediaPlayer.setOnPreparedListener { play() }
+        mediaPlayer.setOnCompletionListener { next() }
+        mediaPlayer.setScreenOnWhilePlaying(true)
+
+    }
 
     override fun onResume() {
         super.onResume()
         scheduler = Executors.newSingleThreadScheduledExecutor()
-        scheduler?.scheduleWithFixedDelay(network::startScan, 0, 30, TimeUnit.MINUTES)
+        scheduler?.scheduleWithFixedDelay(network::startScan, 0, 10, TimeUnit.MINUTES)
     }
 
     override fun onStop() {
+        mediaPlayer.stop()
+        mediaPlayer.release()
         scheduler?.shutdownNow()
         network.endScan()
         super.onStop()
+    }
+
+    private fun setSong(song: Song) {
+        pause()
+        mediaPlayer.release()
+        mediaPlayer.setDataSource(song.url)
+        mediaPlayer.prepare()
+    }
+
+    private var isPaused = true
+    private fun play() {
+        isPaused = false
+        playPauseButton.post { playPauseButton.setBackgroundResource(android.R.drawable.ic_media_pause) }
+        mediaPlayer.start()
+    }
+    private fun pause() {
+        isPaused = true
+        playPauseButton.post { playPauseButton.setBackgroundResource(android.R.drawable.ic_media_play) }
+        mediaPlayer.pause()
+    }
+    private fun playPause() {
+        if(isPaused) play() else pause()
+    }
+    private fun next() {
+        setSong(controller.nextSong())
+    }
+    private fun previous() {
+        setSong(controller.previousSong())
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        when (keyCode) {
+            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> playPause()
+            KeyEvent.KEYCODE_MEDIA_PLAY -> play()
+            KeyEvent.KEYCODE_MEDIA_PAUSE -> pause()
+            KeyEvent.KEYCODE_MEDIA_NEXT -> next()
+            KeyEvent.KEYCODE_MEDIA_PREVIOUS -> previous()
+        }
+        return super.onKeyDown(keyCode, event)
     }
 }
