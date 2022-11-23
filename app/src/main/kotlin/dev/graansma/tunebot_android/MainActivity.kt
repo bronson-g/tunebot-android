@@ -4,6 +4,7 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.KeyEvent
 import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -22,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var nextButton: Button
     private lateinit var previousButton: Button
     private lateinit var playPauseButton: Button
+    private lateinit var currentSongText: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +31,7 @@ class MainActivity : AppCompatActivity() {
 
         controller = Controller(PromotionLevel.valueOf(getString(R.string.promotion_level)))
 
+        currentSongText = findViewById(R.id.currentSongText)
         nextButton = findViewById(R.id.nextButton)
         nextButton.setOnClickListener { next() }
         previousButton = findViewById(R.id.previousButton)
@@ -61,6 +64,7 @@ class MainActivity : AppCompatActivity() {
         mediaPlayer.release()
         mediaPlayer.setDataSource(song.url)
         mediaPlayer.prepare()
+        currentSongText.post { currentSongText.text = song.toString() }
     }
 
     private var isPaused = true

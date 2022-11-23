@@ -2,7 +2,7 @@ package dev.graansma.tunebot_android
 
 import android.media.MediaMetadataRetriever
 
-class Song(val url: String) {
+data class Song(val url: String) {
     val title: String
     val album: String
     val artist: String
@@ -28,5 +28,9 @@ class Song(val url: String) {
             return other == url
         }
         return super.equals(other)
+    }
+
+    override fun toString(): String {
+        return "$title - $artist ($year) : $album"
     }
 }
