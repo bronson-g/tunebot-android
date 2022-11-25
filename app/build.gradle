@@ -9,10 +9,10 @@ android {
 
     defaultConfig {
         applicationId "dev.graansma.tunebot_android"
-        minSdk 31
+        minSdk 22
         targetSdk 33
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
 
     }
 

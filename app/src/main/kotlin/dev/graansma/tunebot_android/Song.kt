@@ -1,6 +1,8 @@
 package dev.graansma.tunebot_android
 
 import android.media.MediaMetadataRetriever
+import android.os.Build
+import android.util.Log
 
 data class Song(val url: String) {
     val title: String
@@ -11,14 +13,24 @@ data class Song(val url: String) {
     val year: String
 
     init {
-        val mmr = if(url.isNotBlank() || url.isEmpty()) MediaMetadataRetriever() else null
-        mmr?.setDataSource(url)
+        var mmr = if (url.isNotBlank() || url.isEmpty()) MediaMetadataRetriever() else null
+
+        try {
+            mmr?.setDataSource(url)
+        } catch (e: Exception) {
+            mmr = null
+            Log.e("init-song", e.message ?: "failed to retrieve meta data for $url")
+        }
+
         title = mmr?.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: ""
         album = mmr?.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) ?: ""
         artist = mmr?.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) ?: ""
         duration = mmr?.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION) ?: ""
-        image = mmr?.extractMetadata(MediaMetadataRetriever.METADATA_KEY_IMAGE_PRIMARY) ?: ""
         year = mmr?.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR) ?: ""
+        image =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+                mmr?.extractMetadata(MediaMetadataRetriever.METADATA_KEY_IMAGE_PRIMARY) ?: ""
+            else ""
     }
 
     override fun equals(other: Any?): Boolean {

@@ -2,6 +2,7 @@ package dev.graansma.tunebot_android
 
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.widget.Button
 import android.widget.TextView
@@ -42,7 +43,6 @@ class MainActivity : AppCompatActivity() {
         mediaPlayer.setOnPreparedListener { play() }
         mediaPlayer.setOnCompletionListener { next() }
         mediaPlayer.setScreenOnWhilePlaying(true)
-
     }
 
     override fun onResume() {
@@ -70,11 +70,13 @@ class MainActivity : AppCompatActivity() {
     private var isPaused = true
     private fun play() {
         isPaused = false
+        Log.d("action", "play")
         playPauseButton.post { playPauseButton.setBackgroundResource(android.R.drawable.ic_media_pause) }
-        mediaPlayer.start()
+        //mediaPlayer.start()
     }
     private fun pause() {
         isPaused = true
+        Log.d("action", "pause")
         playPauseButton.post { playPauseButton.setBackgroundResource(android.R.drawable.ic_media_play) }
         mediaPlayer.pause()
     }
@@ -82,9 +84,11 @@ class MainActivity : AppCompatActivity() {
         if(isPaused) play() else pause()
     }
     private fun next() {
+        Log.d("action", "next")
         setSong(controller.nextSong())
     }
     private fun previous() {
+        Log.d("action", "previous")
         setSong(controller.previousSong())
     }
 

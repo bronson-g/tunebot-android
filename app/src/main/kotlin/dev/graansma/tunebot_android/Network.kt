@@ -17,7 +17,7 @@ abstract class Network {
         }
 
         override fun onFinished(devicesFound: ArrayList<Device>?) {
-            devices = (devicesFound?.map { it.mac } ?: setOf()) as Set<String>
+            devices = (devicesFound?.map { it.mac }?.toSet() ?: setOf())
             onScanComplete(devices)
             isScanning = false
             scanner = null
