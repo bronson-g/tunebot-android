@@ -63,9 +63,12 @@ class Controller(promotionLevel: PromotionLevel) {
         }
 
         library.removeAll(blacklist)
-        library.removeAll(previousSongs.map { it.url })
+        library.removeAll(previousSongs.map { it.url }.toSet())
 
-        nextSongs.removeIf {!library.contains(it.url)}
+
+        nextSongs.forEach {
+            if(!library.contains(it.url)) nextSongs.remove(it)
+        }
 
         library.forEach {
             if(!nextSongs.contains(it)) {

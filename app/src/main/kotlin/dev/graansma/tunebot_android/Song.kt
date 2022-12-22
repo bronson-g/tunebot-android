@@ -45,4 +45,8 @@ data class Song(val url: String) {
     override fun toString(): String {
         return "$title - $artist ($year) : $album"
     }
+
+    override fun hashCode(): Int {
+        return url.hashCode()
+    }
 }
